@@ -1,0 +1,143 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<div style="padding-top: 50px;">
+
+    <div class="col-md-8">
+        <canvas id="FChart"></canvas>
+    </div>
+    <form action="~/Home/Plot" method="post"></form>
+    <div class="col-md-4" style="border: 1px solid black; padding: 15px;">
+        <p>Function: <b>y= <input type="number" id="a" value="1" class="coeffInput" />x^2 + <input type="number" id="b" value="1" class="coeffInput" />x + <input type="number" id="c" value="1" class="coeffInput" /></b></p>
+        <p>Step: <input type="number" id="step" value="1" class="coeffInput" /></p>
+        <p>From: <input type="number" id="xFrom" value="-10" class="coeffInput" /> to <input type="number" id="xTo" value="10" class="coeffInput" /></p>
+        <div class="container-fluid" style="">
+            <button type="submit" class="btn btn-primary" id="plot">Plot</button>
+        </div>
+    </div>
+
+</div>
+<link rel="stylesheet" href="~/Content/bootstrap.min.css"></>
+<style>
+    .coeffInput {
+        width: 50px;
+    }
+</style>
+<script src="~/Scripts/Chart.min.js"></script>
+<script src="~/Scripts/jquery-3.3.1.min.js"></script>
+<script>
+    $("#plot").click(function () {
+        console.log("ploting...");
+        var a = $("#a").val();
+        var b = $("#b").val();
+        var c = $("#c").val();
+        var step = $("#step").val();
+        var xFrom = $("#xFrom").val();
+        var xTo = $("#xTo").val();
+        var plotRequest = {
+            "A": a,
+            "B": b,
+            "C": c,
+            "Step": step,
+            "XFrom": xFrom,
+            "XTo": xTo
+        };
+        console.log(JSON.stringify(plotRequest));
+
+        //$.post('../api/Point/Plot', JSON.stringify(plotRequest));
+        $.ajax({
+            url: '../api/Point/Plot',
+            method: 'POST',
+            data: JSON.stringify(plotRequest),
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function (data) {
+                console.log(JSON.parse(data));
+                plotFunction(JSON.parse(data));
+            }
+        });
+        //plotFunction();
+    });
+</script>
+<script>
+    var ctx = document.getElementById('FChart').getContext('2d');
+    chart = new Chart(ctx, {
+        type: 'line',
+
+    // The data for our dataset
+    data: {
+        labels: [],
+        datasets: [{
+            label: 'f(x)',
+            display: false,
+            backgroundColor: 'blue',
+            borderColor: 'blue',
+            data: [],
+            fill: false
+        }]
+    },
+
+    // Configuration options go here
+    options: {}
+    });
+
+    function plotFunction(plotData) {
+        //plot
+       /* var label = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
+        var data = [0, 10, 5, 2, 20, 30, 45];*/
+        //chart.data.datasets.data = [data.length];
+        addData(chart, plotData);
+    /*var chart = new Chart(ctx, {
+    // The type of chart we want to create
+    type: 'line',
+
+    // The data for our dataset
+    data: {
+        labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+        datasets: [{
+            label: 'f(x)',
+            display: false,
+            backgroundColor: 'blue',
+            borderColor: 'blue',
+            data: [0, 10, 5, 2, 20, 30, 45],
+            fill: false
+        }]
+    },
+
+    // Configuration options go here
+    options: {}
+});*/
+    }
+
+    function addData(chart, label, data) {
+    chart.data.labels = label;
+    chart.data.datasets.forEach((dataset) => {
+        dataset.data = data;
+    });
+    chart.update();
+    }
+    function addData(chart, plotData) {
+        removeData(chart);
+        for (var i in plotData) {
+            chart.data.labels.push(plotData[i].X);
+            chart.data.datasets.forEach((dataset) => {
+                dataset.data.push(plotData[i].Y);
+            });
+        }
+        chart.update();   
+    }
+    function removeData(chart) {
+        while (chart.data.labels[0]) {
+            chart.data.labels.pop();
+        }
+        chart.data.datasets.forEach((dataset) => {
+            while (dataset.data[0]) {
+                dataset.data.pop();
+            }
+        })
+        this.chart.update();
+    }
+
+
+</script>
