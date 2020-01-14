@@ -9,9 +9,9 @@
     </div>
     <form action="~/Home/Plot" method="post"></form>
     <div class="col-md-4" style="border: 1px solid black; padding: 15px;">
-        <p>Function: <b>y= <input type="number" id="a" value="1" class="coeffInput" />x^2 + <input type="number" id="b" value="1" class="coeffInput" />x + <input type="number" id="c" value="1" class="coeffInput" /></b></p>
-        <p>Step: <input type="number" id="step" value="1" class="coeffInput" /></p>
-        <p>From: <input type="number" id="xFrom" value="-10" class="coeffInput" /> to <input type="number" id="xTo" value="10" class="coeffInput" /></p>
+        <p>Function: <b>y= <input type="number" id="a" value="1" class="coeffInput" min="-1000" max="1000" required />x^2 + <input type="number" id="b" value="1" class="coeffInput" min="-1000" max="1000" required />x + <input type="number" id="c" value="1" class="coeffInput" min="-1000" max="1000" required /></b></p>
+        <p>Step: <input type="number" id="step" value="1" class="coeffInput" min="0" max="1000" required /></p>
+        <p>From: <input type="number" id="xFrom" value="-10" class="coeffInput" min="-1000" max="1000" required /> to <input type="number" id="xTo" value="10" class="coeffInput" min="-1000" max="1000" required /></p>
         <div class="container-fluid" style="">
             <button type="submit" class="btn btn-primary" id="plot">Plot</button>
         </div>
@@ -35,6 +35,19 @@
         var step = $("#step").val();
         var xFrom = $("#xFrom").val();
         var xTo = $("#xTo").val();
+        if (Math.abs(a) > 1000 || Math.abs(b) > 1000 || Math.abs(c) > 1000) {
+            alert(`One or more parametres is very big!`);
+            return;
+        }
+        if (step <= 0) {
+            alert(`Incorrect step!`);
+            return;
+        }
+        if ((Math.abs(xFrom) + Math.abs(xTo)) / Math.abs(step) > 1000) {
+            alert(`Too many points, please select smaller range or biggest step!`);
+            return;
+        }
+        
         var plotRequest = {
             "A": a,
             "B": b,
@@ -45,7 +58,6 @@
         };
         console.log(JSON.stringify(plotRequest));
 
-        //$.post('../api/Point/Plot', JSON.stringify(plotRequest));
         $.ajax({
             url: '../api/Point/Plot',
             method: 'POST',
@@ -57,7 +69,6 @@
                 plotFunction(JSON.parse(data));
             }
         });
-        //plotFunction();
     });
 </script>
 <script>
@@ -83,31 +94,9 @@
     });
 
     function plotFunction(plotData) {
-        //plot
-       /* var label = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
-        var data = [0, 10, 5, 2, 20, 30, 45];*/
-        //chart.data.datasets.data = [data.length];
+        
         addData(chart, plotData);
-    /*var chart = new Chart(ctx, {
-    // The type of chart we want to create
-    type: 'line',
-
-    // The data for our dataset
-    data: {
-        labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-        datasets: [{
-            label: 'f(x)',
-            display: false,
-            backgroundColor: 'blue',
-            borderColor: 'blue',
-            data: [0, 10, 5, 2, 20, 30, 45],
-            fill: false
-        }]
-    },
-
-    // Configuration options go here
-    options: {}
-});*/
+    
     }
 
     function addData(chart, label, data) {
