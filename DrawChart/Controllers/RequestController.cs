@@ -10,12 +10,12 @@ namespace DrawChart.Controllers
 {
     public class RequestController : Controller
     {
-        public RequestModel fromJSON(string plotRequest)
+        public RequestViewModel fromJSON(string plotRequest)
         {
-            RequestModel _request = JsonConvert.DeserializeObject<RequestModel>(plotRequest);
+            RequestViewModel _request = JsonConvert.DeserializeObject<RequestViewModel>(plotRequest);
             return _request;
         }
-        public bool Validate(RequestModel request) {
+        public bool Validate(RequestViewModel request) {
             if (Math.Abs(request.A) > 1000 || Math.Abs(request.B) > 1000 || Math.Abs(request.C) > 1000)
             {
                 return false;

@@ -18,14 +18,14 @@ namespace DrawChart.Controllers
             return View();
         }
         [HttpPost]
-        public ActionResult Plot(RequestModel plotRequest)
+        public ActionResult Plot(RequestViewModel plotRequest)
         {
             //RequestModel request = JsonConvert.DeserializeObject<RequestModel>(plotRequest.ToString());
-            RequestModel request = plotRequest;
-            List<PointModel> points = new List<PointModel>();
+            RequestViewModel request = plotRequest;
+            List<PointViewModel> points = new List<PointViewModel>();
             for (double i = request.XFrom; i <= request.XTo; i += request.Step)
             {
-                points.Add(new PointModel(i, request.A * i * i + request.B * i + request.C));
+                points.Add(new PointViewModel(i, request.A * i * i + request.B * i + request.C));
             }
             ViewBag.plotData = pointController.toJSON(points);
             return View(points);

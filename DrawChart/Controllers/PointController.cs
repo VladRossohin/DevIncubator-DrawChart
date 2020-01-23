@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 using System.Web.Mvc;
+using HttpPostAttribute = System.Web.Http.HttpPostAttribute;
 
 namespace DrawChart.Controllers
 {
@@ -18,38 +19,44 @@ namespace DrawChart.Controllers
     {
         ApplicationContext context = new ApplicationContext();
         RequestController requestController = new RequestController();
-        public List<PointModel> _points = new List<PointModel>();
-        public List<PointModel> GetAllPoints()
+        public List<PointViewModel> _points = new List<PointViewModel>();
+        public List<PointViewModel> GetAllPoints()
         {
             return _points;
         }
-        public void Add(PointModel point)
+        public void Add(PointViewModel point)
         {
             _points.Add(point);
         }
-        public string toJSON(List<PointModel> points)
+        public string toJSON(List<PointViewModel> points)
         {
             string serialized = JsonConvert.SerializeObject(points);
             return serialized;
         }
-        public List<PointModel> fromJSON(string json)
+        public List<PointViewModel> fromJSON(string json)
         {
-            List<PointModel> _points = JsonConvert.DeserializeObject<List<PointModel>>(json);
+            List<PointViewModel> _points = JsonConvert.DeserializeObject<List<PointViewModel>>(json);
             return _points;
         }
 
-        [System.Web.Http.HttpPost]
-        public string Plot(RequestModel plotRequest)
+        [HttpPost]
+        public string Plot(RequestViewModel plotRequest)
         {
             /*  Console.WriteLine(plotRequest.ToString());        
               RequestModel request = JsonConvert.DeserializeObject<RequestModel>(plotRequest.ToString());
             */  
             //RequestModel request = JsonConvert.DeserializeObject<RequestModel>(await this.Request.Content.ReadAsStringAsync());
-            RequestModel request = plotRequest;
-            if (!requestController.Validate(request)) return BadRequest().ToString();
+            RequestViewModel request = plotRequest;
+
+            if (!requestController.Validate(request))
+            {
+                return BadRequest().ToString();
+            }
+
             context.OpenConnection();
-            DataTable table = new DataTable();
-            MySqlDataAdapter adapter = new MySqlDataAdapter();
+            
+            var table = new DataTable();
+            var adapter = new MySqlDataAdapter();
             MySqlCommand UserDataCommand = new MySqlCommand("insert into `userdata` (`RangeFrom`, `RangeTo`, `step`, `a`, `b`, `c`) values (" + request.XFrom + ", " + request.XTo + ", " + request.Step + ", " + request.A + ", " + request.B + ", " + request.C + ");");
             UserDataCommand.Connection = context.connection;
             //UserDataCommand.Connection.Open();
@@ -61,11 +68,16 @@ namespace DrawChart.Controllers
             int ChartId = int.Parse(UserDataIdCommand.ExecuteScalar().ToString());
             //ChartId = 1;
             //UserDataIdCommand.Connection.Close();
-            List<PointModel> points = new List<PointModel>();
+            List<PointViewModel> points = new List<PointViewModel>();
+            
             for (double i = request.XFrom; i <= request.XTo; i += request.Step)
             {
-                if (request.XFrom == request.XTo) break;
-                points.Add(new PointModel(i, request.A * i * i + request.B * i + request.C));
+                if (request.XFrom == request.XTo)
+                {
+                    break;
+                }
+
+                points.Add(new PointViewModel(i, request.A * i * i + request.B * i + request.C));
                 MySqlCommand PointCommand = new MySqlCommand("INSERT INTO `points` (`ChartId`, `PointX`, `PointY`) VALUES (" + ChartId + ", " + i + ", " + points.LastOrDefault().Y + ");");
                 PointCommand.Connection = context.connection;
                 //PointCommand.Connection.Open();

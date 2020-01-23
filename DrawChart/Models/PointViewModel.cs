@@ -5,13 +5,13 @@ using System.Web;
 
 namespace DrawChart.Models
 {
-    public class PointModel
+    public class PointViewModel
     {
         public double X { get; set; }
         public double Y { get; set; }
 
-        public PointModel() { }
-        public PointModel(double x, double y)
+        public PointViewModel() { }
+        public PointViewModel(double x, double y)
         {
             X = x;
             Y = y;

@@ -256,8 +256,8 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\db\ApplicationContext.cs" />
-    <Compile Include="Models\PointModel.cs" />
-    <Compile Include="Models\RequestModel.cs" />
+    <Compile Include="Models\PointViewModel.cs" />
+    <Compile Include="Models\RequestViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
