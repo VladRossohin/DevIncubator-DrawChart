@@ -1,3 +1,8 @@
+using ChartDraw.BLL.Infrastructure;
+using DrawChart.Util;
+using Ninject;
+using Ninject.Modules;
+using Ninject.Web.WebApi;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +23,13 @@ namespace DrawChart
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
+
+            // DI
+            NinjectModule pointModule = new PointModule();
+            NinjectModule userDataModule = new UserDataModule();
+            NinjectModule serviceModule = new ServiceModule("DefaultConnection");
+            var kernel = new StandardKernel(pointModule, userDataModule, serviceModule);
+            DependencyResolver.SetResolver(new NinjectDependencyResolver(kernel));
         }
     }
 }

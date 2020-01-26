@@ -20,19 +20,23 @@ namespace DrawChart.Controllers
         ApplicationContext context = new ApplicationContext();
         RequestController requestController = new RequestController();
         public List<PointViewModel> _points = new List<PointViewModel>();
+
         public List<PointViewModel> GetAllPoints()
         {
             return _points;
         }
+
         public void Add(PointViewModel point)
         {
             _points.Add(point);
         }
+
         public string toJSON(List<PointViewModel> points)
         {
             string serialized = JsonConvert.SerializeObject(points);
             return serialized;
         }
+
         public List<PointViewModel> fromJSON(string json)
         {
             List<PointViewModel> _points = JsonConvert.DeserializeObject<List<PointViewModel>>(json);
@@ -42,10 +46,6 @@ namespace DrawChart.Controllers
         [HttpPost]
         public string Plot(RequestViewModel plotRequest)
         {
-            /*  Console.WriteLine(plotRequest.ToString());        
-              RequestModel request = JsonConvert.DeserializeObject<RequestModel>(plotRequest.ToString());
-            */  
-            //RequestModel request = JsonConvert.DeserializeObject<RequestModel>(await this.Request.Content.ReadAsStringAsync());
             RequestViewModel request = plotRequest;
 
             if (!requestController.Validate(request))

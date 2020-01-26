@@ -20,7 +20,6 @@ namespace DrawChart.Controllers
         [HttpPost]
         public ActionResult Plot(RequestViewModel plotRequest)
         {
-            //RequestModel request = JsonConvert.DeserializeObject<RequestModel>(plotRequest.ToString());
             RequestViewModel request = plotRequest;
             List<PointViewModel> points = new List<PointViewModel>();
             for (double i = request.XFrom; i <= request.XTo; i += request.Step)
