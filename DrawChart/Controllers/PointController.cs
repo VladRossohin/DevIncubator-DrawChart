@@ -1,10 +1,14 @@
-﻿using DrawChart.Models;
+﻿using ChartDraw.BLL.DTO;
+using ChartDraw.BLL.Interfaces;
+using ChartDraw.BLL.Services;
+using DrawChart.Models;
 using DrawChart.Models.db;
 using Microsoft.Ajax.Utilities;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
@@ -20,6 +24,15 @@ namespace DrawChart.Controllers
         ApplicationContext context = new ApplicationContext();
         RequestController requestController = new RequestController();
         public List<PointViewModel> _points = new List<PointViewModel>();
+        IPointService _pointService = new PointService();
+        IUserDataService _userDataService = new UserDataService();
+
+        public PointController() { }
+        public PointController(IPointService pointService, IUserDataService userDataService)
+        {
+            _pointService = pointService;
+            _userDataService = userDataService;
+        }
 
         public List<PointViewModel> GetAllPoints()
         {
@@ -44,50 +57,58 @@ namespace DrawChart.Controllers
         }
 
         [HttpPost]
-        public string Plot(RequestViewModel plotRequest)
+        public string Plot(UserDataViewModel plotRequest)
         {
-            RequestViewModel request = plotRequest;
-
-            if (!requestController.Validate(request))
+            try
             {
-                return BadRequest().ToString();
+                var userDataDTO = new UserDataDTO { A = plotRequest.A, B = plotRequest.B, C = plotRequest.C, PointFrom = plotRequest.PointFrom, PointTo = plotRequest.PointTo, Step = plotRequest.Step };
+                _userDataService.AddUserData(userDataDTO);
+                List<PointDTO> pointDTOs = new List<PointDTO>();
+                pointDTOs = _userDataService.Plot(userDataDTO);
+                return JsonConvert.SerializeObject(pointDTOs);
             }
-
-            context.OpenConnection();
-            
-            var table = new DataTable();
-            var adapter = new MySqlDataAdapter();
-            MySqlCommand UserDataCommand = new MySqlCommand("insert into `userdata` (`RangeFrom`, `RangeTo`, `step`, `a`, `b`, `c`) values (" + request.XFrom + ", " + request.XTo + ", " + request.Step + ", " + request.A + ", " + request.B + ", " + request.C + ");");
-            UserDataCommand.Connection = context.connection;
-            //UserDataCommand.Connection.Open();
-            UserDataCommand.ExecuteNonQuery();
-            //UserDataCommand.Connection.Close();
-            MySqlCommand UserDataIdCommand = new MySqlCommand("SELECT MAX(userdata.UserDataId) from `userdata`;");
-            UserDataIdCommand.Connection = context.connection;
-            //UserDataIdCommand.Connection.Open();
-            int ChartId = int.Parse(UserDataIdCommand.ExecuteScalar().ToString());
-            //ChartId = 1;
-            //UserDataIdCommand.Connection.Close();
-            List<PointViewModel> points = new List<PointViewModel>();
-            
-            for (double i = request.XFrom; i <= request.XTo; i += request.Step)
+            catch (ValidationException ex)
             {
-                if (request.XFrom == request.XTo)
-                {
-                    break;
-                }
-
-                points.Add(new PointViewModel(i, request.A * i * i + request.B * i + request.C));
-                MySqlCommand PointCommand = new MySqlCommand("INSERT INTO `points` (`ChartId`, `PointX`, `PointY`) VALUES (" + ChartId + ", " + i + ", " + points.LastOrDefault().Y + ");");
-                PointCommand.Connection = context.connection;
-                //PointCommand.Connection.Open();
-                PointCommand.ExecuteNonQuery();
-                //PointCommand.Connection.Close();
-
+                return ex.ToString();
             }
-            context.closeConnection();
-
-            return JsonConvert.SerializeObject(points);
         }
     }
+    /*public string Plot(UserDataViewModel plotRequest)
+    {
+        UserDataViewModel request = plotRequest;
+
+        if (!requestController.Validate(request))
+        {
+            return BadRequest().ToString();
+        }
+
+        context.OpenConnection();
+
+        var table = new DataTable();
+        var adapter = new MySqlDataAdapter();
+        MySqlCommand UserDataCommand = new MySqlCommand("insert into `userdata` (`RangeFrom`, `RangeTo`, `step`, `a`, `b`, `c`) values (" + request.PointFrom + ", " + request.PointTo + ", " + request.Step + ", " + request.A + ", " + request.B + ", " + request.C + ");");
+        UserDataCommand.Connection = context.connection;
+        UserDataCommand.ExecuteNonQuery();
+        MySqlCommand UserDataIdCommand = new MySqlCommand("SELECT MAX(userdata.UserDataId) from `userdata`;");
+        UserDataIdCommand.Connection = context.connection;
+        int ChartId = int.Parse(UserDataIdCommand.ExecuteScalar().ToString());
+        List<PointViewModel> points = new List<PointViewModel>();
+
+        for (double i = request.PointFrom; i <= request.PointTo; i += request.Step)
+        {
+            if (request.PointFrom == request.PointTo)
+            {
+                break;
+            }
+
+            points.Add(new PointViewModel(i, request.A * i * i + request.B * i + request.C));
+            MySqlCommand PointCommand = new MySqlCommand("INSERT INTO `points` (`ChartId`, `PointX`, `PointY`) VALUES (" + ChartId + ", " + i + ", " + points.LastOrDefault().Y + ");");
+            PointCommand.Connection = context.connection;
+            PointCommand.ExecuteNonQuery();
+
+        }
+        context.closeConnection();
+
+        return JsonConvert.SerializeObject(points);
+    }*/
 }

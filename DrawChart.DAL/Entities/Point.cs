@@ -18,6 +18,14 @@ namespace ChartDraw.DAL.Entities
         {
         }
 
+        public Point(int userDataId, double pointX, double pointY, UserData userData)
+        {
+            UserDataId = userDataId;
+            PointX = pointX;
+            PointY = pointY;
+            UserData = userData;
+        }
+
         public Point(int id, int userDataId, double pointX, double pointY, UserData userData)
         {
             Id = id;

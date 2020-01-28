@@ -11,7 +11,7 @@ namespace ChartDraw.DAL.Repositories
 {
     public class UserDataRepository : IRepository<UserData>
     {
-        private ChartContext db;
+        private ChartContext db = ChartContext.getInstance("Data Source=DESKTOP-TJ6V82E;Initial Catalog=chartdb;Integrated Security=True");
         public void Create(UserData item)
         {
             db.UserData.Add(item);

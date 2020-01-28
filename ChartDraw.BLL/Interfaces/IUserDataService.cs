@@ -12,6 +12,7 @@ namespace ChartDraw.BLL.Interfaces
         void AddUserData(UserDataDTO userData);
         IEnumerable<UserDataDTO> GetAllUserDatas();
         //IEnumerable<PointDTO> GetPoints(UserDataDTO userData);
+        List<PointDTO> Plot(UserDataDTO userData);
         void Dispose();
 
     }

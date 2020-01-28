@@ -29,7 +29,7 @@ namespace DrawChart
             NinjectModule userDataModule = new UserDataModule();
             NinjectModule serviceModule = new ServiceModule("DefaultConnection");
             var kernel = new StandardKernel(pointModule, userDataModule, serviceModule);
-            DependencyResolver.SetResolver(new NinjectDependencyResolver(kernel));
+            DependencyResolver.SetResolver(new Ninject.Web.Mvc.NinjectDependencyResolver(kernel));
         }
     }
 }

@@ -12,5 +12,24 @@ namespace ChartDraw.BLL.DTO
         public int UserDataId { get; set; }
         public double PointX { get; set; }
         public double PointY { get; set; }
+
+        public PointDTO(int id, int userDataId, double pointX, double pointY)
+        {
+            Id = id;
+            UserDataId = userDataId;
+            PointX = pointX;
+            PointY = pointY;
+        }
+
+        public PointDTO(int userDataId, double pointX, double pointY)
+        {
+            UserDataId = userDataId;
+            PointX = pointX;
+            PointY = pointY;
+        }
+
+        public PointDTO()
+        {
+        }
     }
 }

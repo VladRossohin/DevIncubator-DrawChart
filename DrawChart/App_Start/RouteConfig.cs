@@ -18,6 +18,11 @@ namespace DrawChart
                 url: "{controller}/{action}/{id}",
                 defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
             );
+            routes.MapRoute(
+                name: "Plot",
+                url: "api/{controller}/{action}",
+                defaults: new { controller = "Home", action = "Index" }
+                );
         }
     }
 }

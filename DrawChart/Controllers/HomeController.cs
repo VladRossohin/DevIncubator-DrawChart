@@ -1,33 +1,48 @@
-﻿using DrawChart.Models;
+﻿using ChartDraw.BLL.DTO;
+using ChartDraw.BLL.Interfaces;
+using DrawChart.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
+using System.Web.Http;
 using System.Web.Mvc;
 
 namespace DrawChart.Controllers
 {
     public class HomeController : Controller
     {
-        private PointController pointController = new PointController();
-        private RequestController requestController = new RequestController();
-        public ActionResult Index()
+        IPointService _pointService;
+        IUserDataService _userDataService;
+
+        public HomeController(IPointService pointService, IUserDataService userDataService)
+        {
+            _pointService = pointService;
+            _userDataService = userDataService;
+        }
+public ActionResult Index()
         {
             ViewBag.Title = "Home Page";
 
             return View();
         }
-        [HttpPost]
-        public ActionResult Plot(RequestViewModel plotRequest)
+        [System.Web.Http.HttpPost]
+        public string Plot(UserDataViewModel plotRequest)
         {
-            RequestViewModel request = plotRequest;
-            List<PointViewModel> points = new List<PointViewModel>();
-            for (double i = request.XFrom; i <= request.XTo; i += request.Step)
+            try
             {
-                points.Add(new PointViewModel(i, request.A * i * i + request.B * i + request.C));
+                var userDataDTO = new UserDataDTO { A = plotRequest.A, B = plotRequest.B, C = plotRequest.C, PointFrom = plotRequest.PointFrom, PointTo = plotRequest.PointTo };
+                _userDataService.AddUserData(userDataDTO);
+                List<PointDTO> pointDTOs = new List<PointDTO>();
+                pointDTOs = _userDataService.Plot(userDataDTO);
+                return JsonConvert.SerializeObject(pointDTOs);
             }
-            ViewBag.plotData = pointController.toJSON(points);
-            return View(points);
+            catch (ValidationException ex)
+            {
+                return ex.ToString();
+            }
         }
     }
 }

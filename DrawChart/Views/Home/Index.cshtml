@@ -32,18 +32,18 @@
         var a = $("#a").val();
         var b = $("#b").val();
         var c = $("#c").val();
-        var step = $("#step").val();
-        var xFrom = $("#xFrom").val();
-        var xTo = $("#xTo").val();
+        var Step = $("#step").val();
+        var PointFrom = $("#xFrom").val();
+        var PointTo = $("#xTo").val();
         if (Math.abs(a) > 1000 || Math.abs(b) > 1000 || Math.abs(c) > 1000) {
             alert(`One or more parametres is very big!`);
             return;
         }
-        if (step <= 0) {
+        if (Step <= 0) {
             alert(`Incorrect step!`);
             return;
         }
-        if ((Math.abs(xFrom) + Math.abs(xTo)) / Math.abs(step) > 1000) {
+        if ((Math.abs(xFrom) + Math.abs(xTo)) / Math.abs(Step) > 1000) {
             alert(`Too many points, please select smaller range or biggest step!`);
             return;
         }
@@ -52,9 +52,9 @@
             "A": a,
             "B": b,
             "C": c,
-            "Step": step,
-            "XFrom": xFrom,
-            "XTo": xTo
+            "Step": Step,
+            "PointFrom": PointFrom,
+            "PointTo": PointTo
         };
         console.log(JSON.stringify(plotRequest));
 
@@ -109,9 +109,9 @@
     function addData(chart, plotData) {
         removeData(chart);
         for (var i in plotData) {
-            chart.data.labels.push(plotData[i].X);
+            chart.data.labels.push(plotData[i].PointX);
             chart.data.datasets.forEach((dataset) => {
-                dataset.data.push(plotData[i].Y);
+                dataset.data.push(plotData[i].PointY);
             });
         }
         chart.update();   

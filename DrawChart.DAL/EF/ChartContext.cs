@@ -32,6 +32,8 @@ namespace ChartDraw.DAL.EF
         {
 
         }
+
+        
     }
 
     public class StoreDbInitializer : CreateDatabaseIfNotExists<ChartContext>

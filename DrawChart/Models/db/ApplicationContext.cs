@@ -12,7 +12,7 @@ namespace DrawChart.Models.db
     {
 
         public DbSet<PointViewModel> Points { get; set; }
-        public DbSet<RequestViewModel> UserData { get; set; }
+        public DbSet<UserDataViewModel> UserData { get; set; }
         public MySqlConnection connection { get; set; }
         
         public ApplicationContext()
